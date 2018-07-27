@@ -32,7 +32,7 @@ var Engine = (function(global) {
     doc.body.appendChild(canvas);
 
     /* This function serves as the kickoff point for the game loop itself
-     * and handles properly calling the update and render methods.
+     * and handles properly calling the update and render and renderEntities methods.
      */
     function main() {
         /* Get our time delta information which is required if your game
@@ -61,6 +61,11 @@ var Engine = (function(global) {
          */
         requestID = win.requestAnimationFrame(main);
 
+        /*
+         * check if there is no lives left for player then resets game and draw lose message
+         * then checks if player won by reaching water and resets the game and draw win message
+         * both messages appear for 2 sec then goes to start screen
+         */
         if (player.lives <= 0) {
             reset();
             ctx.beginPath();
@@ -100,14 +105,16 @@ var Engine = (function(global) {
         }
     }
 
-    /* This function does some initial setup that should only occur once,
-     * particularly setting the lastTime variable that is required for the
-     * game loop.
+    /* starts the game app by calling main menu
      */
     function init() {
         srt_menu.init();
     }
 
+    /* This function does some initial setup that should only occur once,
+     * particularly setting the lastTime variable that is required for the
+     * game loop.
+     */
     function startGame() {
         reset();
         lastTime = Date.now();
@@ -142,8 +149,7 @@ var Engine = (function(global) {
         player.update();
     }
 
-    /* This function initially draws the "game level", it will then call
-     * the renderEntities function. Remember, this function is called every
+    /* This function initially draws the "game level". Remember, this function is called every
      * game tick (or loop of the game engine) because that's how games work -
      * they are flipbooks creating the illusion of animation but in reality
      * they are just drawing the entire screen over and over.
@@ -200,12 +206,10 @@ var Engine = (function(global) {
         player.render();
     }
 
-    /* This function does nothing but it could have been a good place to
-     * handle game reset states - maybe a new game menu or a game over screen
-     * those sorts of things. It's only called once by the init() method.
+    /* This function is called after game is finished to stop animation frame
+     * and to reset canvas, player postion and enemy postion
      */
     function reset() {
-        // noop
         win.cancelAnimationFrame(requestID);
         render();
         player.reset();
