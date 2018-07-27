@@ -21,12 +21,12 @@ var startMenu = function(startGame, render) {
         { name: 'char-princess-girl', x: 404, y: 230 }
     ];
 
-    this.canvas = document.getElementById('gameCanvas');
     this.game_func = startGame;
     this.render = render
 }
 
 startMenu.prototype.init = function() {
+    this.canvas = document.getElementById('gameCanvas');
     this.state = "startingMenu";
     this.render();
     this.drawStartButtons();

@@ -22,6 +22,8 @@ var Engine = (function(global) {
         win = global.window,
         canvas = doc.createElement('canvas'),
         ctx = canvas.getContext('2d'),
+        srt_menu = new startMenu(startGame, render),
+        requestID,
         lastTime;
 
     canvas.width = 505;
@@ -45,9 +47,9 @@ var Engine = (function(global) {
         /* Call our update/render functions, pass along the time delta to
          * our update function since it may be used for smooth animation.
          */
-        update(dt);
         render();
         renderEntities();
+        update(dt);
 
         /* Set our lastTime variable which is used to determine the time delta
          * for the next time this function is called.
@@ -57,7 +59,45 @@ var Engine = (function(global) {
         /* Use the browser's requestAnimationFrame function to call this
          * function again as soon as the browser is able to draw another frame.
          */
-        win.requestAnimationFrame(main);
+        requestID = win.requestAnimationFrame(main);
+
+        if (player.lives <= 0) {
+            reset();
+            ctx.beginPath();
+            ctx.lineWidth = "5";
+            ctx.rect(125, 250, 250, 150);
+            ctx.fillStyle = '#DFD9C8';
+            ctx.fill();
+            ctx.strokeStyle = "#A8A8A2";
+            ctx.stroke();
+            ctx.closePath();
+            ctx.font = '30pt Comic Sans MS';
+            ctx.fillStyle = '#505050';
+            ctx.fillText('You Lost', 170, 330);
+
+            setTimeout(() => {
+                srt_menu.init();
+            }, 2000);
+        } else if (player.posY == 1) {
+            setTimeout(() => {
+                reset();
+
+                ctx.beginPath();
+                ctx.lineWidth = "5";
+                ctx.rect(125, 250, 250, 150);
+                ctx.fillStyle = '#DFD9C8';
+                ctx.fill();
+                ctx.strokeStyle = "#A8A8A2";
+                ctx.stroke();
+                ctx.closePath();
+                ctx.font = '30pt Comic Sans MS';
+                ctx.fillStyle = '#505050';
+                ctx.fillText('You Won', 170, 330);
+                setTimeout(() => {
+                    srt_menu.init();
+                }, 2000);
+            }, 100);
+        }
     }
 
     /* This function does some initial setup that should only occur once,
@@ -65,7 +105,6 @@ var Engine = (function(global) {
      * game loop.
      */
     function init() {
-        var srt_menu = new startMenu(startGame, render);
         srt_menu.init();
     }
 
@@ -167,6 +206,13 @@ var Engine = (function(global) {
      */
     function reset() {
         // noop
+        win.cancelAnimationFrame(requestID);
+        render();
+        player.reset();
+        for (let index = 0; index < allEnemies.length; index++) {
+            const enemy = allEnemies[index];
+            enemy.resetPostion();
+        }
     }
 
     /* Go ahead and load all of the images we know we're going to need to
@@ -182,7 +228,8 @@ var Engine = (function(global) {
         'images/char-cat-girl.png',
         'images/char-horn-girl.png',
         'images/char-pink-girl.png',
-        'images/char-princess-girl.png'
+        'images/char-princess-girl.png',
+        'images/Heart.png'
     ]);
     Resources.onReady(init);
 
